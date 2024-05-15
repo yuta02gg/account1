@@ -1,10 +1,26 @@
 <?php
 include 'includes/db.php';
-session_start(); // セッションを開始
+session_start();
 
-$errors = [];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $_SESSION['family_name'] = $_POST['family_name'];
+    $_SESSION['last_name'] = $_POST['last_name'];
+    $_SESSION['family_name_kana'] = $_POST['family_name_kana'];
+    $_SESSION['last_name_kana'] = $_POST['last_name_kana'];
+    $_SESSION['mail'] = $_POST['mail'];
+    $_SESSION['password'] = $_POST['password'];
+    $_SESSION['gender'] = $_POST['gender'];
+    $_SESSION['postal_code'] = $_POST['postal_code'];
+    $_SESSION['prefecture'] = $_POST['prefecture'];
+    $_SESSION['address_1'] = $_POST['address_1'];
+    $_SESSION['address_2'] = $_POST['address_2'];
+    $_SESSION['authority'] = $_POST['authority'];
 
-// セッションからデータを取得
+    header("Location: regist_confirm.php");
+    exit();
+}
+
+// セッション変数のチェックと取得
 $family_name = isset($_SESSION['family_name']) ? $_SESSION['family_name'] : '';
 $last_name = isset($_SESSION['last_name']) ? $_SESSION['last_name'] : '';
 $family_name_kana = isset($_SESSION['family_name_kana']) ? $_SESSION['family_name_kana'] : '';

@@ -54,6 +54,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
     } catch(PDOException $e) {
         echo "エラーが発生したためアカウント登録できません: " . $e->getMessage();
     }
+} else if (!isset($_SESSION['family_name'])) {
+    // セッションがない場合は登録フォームにリダイレクト
+    header("Location: regist.php");
+    exit();
 }
 ?>
 
@@ -68,10 +72,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+            margin: 0;
         }
         .container {
-            width: 300px;
-            margin: 50px auto;
+            text-align: center;
+            background-color: white;
+            padding: 50px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         button {
             padding: 10px 20px;
@@ -79,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             color: white;
             border: none;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background-color: #45a049;
@@ -87,8 +106,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
 </head>
 <body>
     <div class="container">
-        <p>登録完了しました</p>
-        <a href="index.html">
+        <h1>登録完了しました</h1>
+        <a href="diworks.html">
             <button>TOPページへ戻る</button>
         </a>
     </div>

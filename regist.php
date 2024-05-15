@@ -1,25 +1,6 @@
 <?php
 include 'includes/db.php';
-session_start(); // セッションを開始
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 入力データをセッションに保存
-    $_SESSION['family_name'] = $_POST['family_name'];
-    $_SESSION['last_name'] = $_POST['last_name'];
-    $_SESSION['family_name_kana'] = $_POST['family_name_kana'];
-    $_SESSION['last_name_kana'] = $_POST['last_name_kana'];
-    $_SESSION['mail'] = $_POST['mail'];
-    $_SESSION['password'] = $_POST['password'];
-    $_SESSION['gender'] = $_POST['gender'];
-    $_SESSION['postal_code'] = $_POST['postal_code'];
-    $_SESSION['prefecture'] = $_POST['prefecture'];
-    $_SESSION['address_1'] = $_POST['address_1'];
-    $_SESSION['address_2'] = $_POST['address_2'];
-    $_SESSION['authority'] = $_POST['authority'];
-
-    header("Location: regist_confirm.php");
-    exit();
-}
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -60,10 +41,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         button:hover {
             background-color: #45a049;
         }
+        .error {
+            color: red;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
     </style>
+    <script>
+        function validateForm() {
+            let isValid = true;
+            document.querySelectorAll('.error').forEach(e => e.remove());
+
+            const requiredFields = [
+                'family_name', 'last_name', 'family_name_kana', 'last_name_kana', 
+                'mail', 'password', 'postal_code', 'prefecture', 
+                'address_1', 'address_2'
+            ];
+
+            const patterns = {
+                family_name: /^[ぁ-んァ-ヶ一-龠]+$/,
+                last_name: /^[ぁ-んァ-ヶ一-龠]+$/,
+                family_name_kana: /^[ァ-ヶー]+$/,
+                last_name_kana: /^[ァ-ヶー]+$/,
+                mail: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                password: /^[a-zA-Z0-9]+$/,
+                postal_code: /^[0-9]{7}$/,
+                address_1: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/,
+                address_2: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/
+            };
+
+            requiredFields.forEach(field => {
+                const value = document.forms['registForm'][field].value.trim();
+                if (!value) {
+                    const error = document.createElement('div');
+                    error.className = 'error';
+                    error.innerText = `${field.replace('_', ' ')} が未入力です。`;
+                    document.forms['registForm'][field].parentElement.appendChild(error);
+                    isValid = false;
+                } else if (patterns[field] && !patterns[field].test(value)) {
+                    const error = document.createElement('div');
+                    error.className = 'error';
+                    error.innerText = `${field.replace('_', ' ')} の形式が正しくありません。`;
+                    document.forms['registForm'][field].parentElement.appendChild(error);
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+    </script>
 </head>
 <body>
-    <form action="regist.php" method="post">
+    <form name="registForm" action="regist_confirm.php" method="post" onsubmit="return validateForm()">
         <label for="family_name">名前（姓）</label>
         <input type="text" id="family_name" name="family_name" maxlength="10" required>
 

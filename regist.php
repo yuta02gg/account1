@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>アカウント登録</title>
+    <title>アカウント登録画面</title>
     <style type="text/css">
         body {
             font-family: Arial, sans-serif;
+        }
+        .header, .footer {
+            padding:5px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+        p{
+            margin: 0 auto;
         }
         form {
             width: 300px;
@@ -82,6 +90,10 @@
     </script>
 </head>
 <body>
+    <div class="header">
+        <p>ナビゲーションバー</p>
+    </div>
+    <h2>アカウント登録画面</h2>
     <form name="registForm" action="regist_confirm.php" method="post" onsubmit="return validateForm()">
         <label for="family_name">名前（姓）</label>
         <input type="text" id="family_name" name="family_name" maxlength="10">
@@ -174,5 +186,8 @@
 
         <button type="submit">確認する</button>
     </form>
+    <div class="footer">
+            <p>フッター</p>
+    </div>
 </body>
 </html>

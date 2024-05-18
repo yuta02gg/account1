@@ -42,10 +42,18 @@ $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>アカウント登録確認</title>
+    <title>アカウント登録確認画面</title>
     <style type="text/css">
         body {
             font-family: Arial, sans-serif;
+        }
+        .header, .footer {
+            padding:5px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+        p{
+            margin: 0 auto;
         }
         .container {
             width: 300px;
@@ -81,6 +89,10 @@ $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
     </style>
 </head>
 <body>
+     <div class="header">
+        <p>ナビゲーションバー</p>
+    </div>
+    <h2>アカウント登録確認画面</h2>
     <div class="container">
         <div class="data">
             <label>名前（姓）</label>
@@ -138,7 +150,10 @@ $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
             <a href="javascript:history.back()">
                 <button type="button">前に戻る</button>
             </a>
-        </div>
+        </div>     
+    </div>
+    <div class="footer">
+            <p>フッター</p>
     </div>
 </body>
 </html>

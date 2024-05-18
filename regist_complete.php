@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             padding: 50px 0;
         }
         .main p {
-            font-size: 20px;
+            font-size: 50px;
             margin-bottom: 30px;
         }
         .button {
@@ -98,17 +98,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>アカウント登録完了画面</h1>
-        </div>
+    <div class="header">
+            <p>ナビゲーションバー</p>
+    </div>
+    <div class="container">  
+        <h1>アカウント登録完了画面</h1>
         <div class="main">
             <p>登録完了しました</p>
             <a class="button" href="index.html">TOPページへ戻る</a>
         </div>
-        <div class="footer">
-            <p>&copy; 2024 Your Company</p>
-        </div>
+    </div>
+    <div class="footer">
+            <p>フッター</p>
     </div>
 </body>
 </html>

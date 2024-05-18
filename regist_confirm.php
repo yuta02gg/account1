@@ -53,7 +53,7 @@ $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
             border-bottom: 1px solid #ddd;
         }
         p{
-            margin: 0 auto;
+            text-align: center;
         }
         .container {
             width: 300px;

@@ -15,7 +15,7 @@
             border-bottom: 1px solid #ddd;
         }
         p{
-            margin: 0 auto;
+            text-align: center;
         }
         form {
             width: 300px;

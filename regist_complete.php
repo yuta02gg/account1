@@ -66,11 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         body {
             font-family: Arial, sans-serif;
         }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            text-align: center;
-        }
+     
         .header, .footer {
             padding: 20px;
             background-color: #f8f8f8;
@@ -86,6 +82,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             font-size: 50px;
             margin-bottom: 30px;
         }
+        .main a{
+            margin-left: 44%;
+        }
+        p{
+            text-align: center;
+        }
         .button {
             display: inline-block;
             padding: 10px 20px;
@@ -94,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             background-color: #007bff;
             text-decoration: none;
             border-radius: 5px;
+            
         }
     </style>
 </head>

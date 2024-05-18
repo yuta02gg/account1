@@ -1,8 +1,3 @@
-<?php
-include 'includes/db.php';
-session_start();
-?>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -53,36 +48,31 @@ session_start();
             document.querySelectorAll('.error').forEach(e => e.remove());
 
             const requiredFields = [
-                'family_name', 'last_name', 'family_name_kana', 'last_name_kana', 
-                'mail', 'password', 'postal_code', 'prefecture', 
-                'address_1', 'address_2'
+                { name: 'family_name', displayName: '名前（姓）', pattern: /^[ぁ-ん一-龠]+$/, errorMessage: '名前（姓）は日本語の漢字またはひらがなで入力してください。' },
+                { name: 'last_name', displayName: '名前（名）', pattern: /^[ぁ-ん一-龠]+$/, errorMessage: '名前（名）は日本語の漢字またはひらがなで入力してください。' },
+                { name: 'family_name_kana', displayName: 'カナ（姓）', pattern: /^[ァ-ヶー]+$/, errorMessage: 'カナ（姓）はカタカナで入力してください。' },
+                { name: 'last_name_kana', displayName: 'カナ（名）', pattern: /^[ァ-ヶー]+$/, errorMessage: 'カナ（名）はカタカナで入力してください。' },
+                { name: 'mail', displayName: 'メールアドレス', pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, errorMessage: '有効なメールアドレスを入力してください。' },
+                { name: 'password', displayName: 'パスワード', pattern: /^[a-zA-Z0-9]+$/, errorMessage: 'パスワードは英数字で入力してください。' },
+                { name: 'postal_code', displayName: '郵便番号', pattern: /^[0-9]{7}$/, errorMessage: '郵便番号は7桁の数字で入力してください。' },
+                { name: 'address_1', displayName: '住所（市区町村）', pattern: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/, errorMessage: '住所（市区町村）は有効な形式で入力してください。' },
+                { name: 'address_2', displayName: '住所（番地）', pattern: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/, errorMessage: '住所（番地）は有効な形式で入力してください。' }
             ];
 
-            const patterns = {
-                family_name: /^[ぁ-んァ-ヶ一-龠]+$/,
-                last_name: /^[ぁ-んァ-ヶ一-龠]+$/,
-                family_name_kana: /^[ァ-ヶー]+$/,
-                last_name_kana: /^[ァ-ヶー]+$/,
-                mail: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                password: /^[a-zA-Z0-9]+$/,
-                postal_code: /^[0-9]{7}$/,
-                address_1: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/,
-                address_2: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/
-            };
-
             requiredFields.forEach(field => {
-                const value = document.forms['registForm'][field].value.trim();
+                const value = document.forms['registForm'][field.name].value.trim();
+                const fieldElement = document.forms['registForm'][field.name];
                 if (!value) {
                     const error = document.createElement('div');
                     error.className = 'error';
-                    error.innerText = `${field.replace('_', ' ')} が未入力です。`;
-                    document.forms['registForm'][field].parentElement.appendChild(error);
+                    error.innerText = `${field.displayName}が未入力です。`;
+                    fieldElement.parentElement.insertBefore(error, fieldElement.nextSibling);
                     isValid = false;
-                } else if (patterns[field] && !patterns[field].test(value)) {
+                } else if (field.pattern && !field.pattern.test(value)) {
                     const error = document.createElement('div');
                     error.className = 'error';
-                    error.innerText = `${field.replace('_', ' ')} の形式が正しくありません。`;
-                    document.forms['registForm'][field].parentElement.appendChild(error);
+                    error.innerText = field.errorMessage;
+                    fieldElement.parentElement.insertBefore(error, fieldElement.nextSibling);
                     isValid = false;
                 }
             });
@@ -94,33 +84,33 @@ session_start();
 <body>
     <form name="registForm" action="regist_confirm.php" method="post" onsubmit="return validateForm()">
         <label for="family_name">名前（姓）</label>
-        <input type="text" id="family_name" name="family_name" maxlength="10" required>
+        <input type="text" id="family_name" name="family_name" maxlength="10">
 
         <label for="last_name">名前（名）</label>
-        <input type="text" id="last_name" name="last_name" maxlength="10" required>
+        <input type="text" id="last_name" name="last_name" maxlength="10">
 
         <label for="family_name_kana">カナ（姓）</label>
-        <input type="text" id="family_name_kana" name="family_name_kana" maxlength="10" required>
+        <input type="text" id="family_name_kana" name="family_name_kana" maxlength="10">
 
         <label for="last_name_kana">カナ（名）</label>
-        <input type="text" id="last_name_kana" name="last_name_kana" maxlength="10" required>
+        <input type="text" id="last_name_kana" name="last_name_kana" maxlength="10">
 
         <label for="mail">メールアドレス</label>
-        <input type="email" id="mail" name="mail" maxlength="100" required>
+        <input type="email" id="mail" name="mail" maxlength="100">
 
         <label for="password">パスワード</label>
-        <input type="password" id="password" name="password" maxlength="10" required>
+        <input type="password" id="password" name="password" maxlength="10">
 
         <label>性別</label>
         <input type="radio" name="gender" value="0" checked> 男
         <input type="radio" name="gender" value="1"> 女<br>
 
         <label for="postal_code">郵便番号</label>
-        <input type="text" id="postal_code" name="postal_code" maxlength="7" required>
+        <input type="text" id="postal_code" name="postal_code" maxlength="7">
 
         <label for="prefecture">住所（都道府県）</label>
-        <select id="prefecture" name="prefecture" required>
-            <option value="">選択してください</option>
+        <select id="prefecture" name="prefecture">
+            <option value=""></option>
             <option value="北海道">北海道</option>
             <option value="青森県">青森県</option>
             <option value="岩手県">岩手県</option>
@@ -171,13 +161,13 @@ session_start();
         </select><br>
 
         <label for="address_1">住所（市区町村）</label>
-        <input type="text" id="address_1" name="address_1" maxlength="10" required>
+        <input type="text" id="address_1" name="address_1" maxlength="10">
 
         <label for="address_2">住所（番地）</label>
-        <input type="text" id="address_2" name="address_2" maxlength="100" required>
+        <input type="text" id="address_2" name="address_2" maxlength="100">
 
         <label for="authority">アカウント権限</label>
-        <select id="authority" name="authority" required>
+        <select id="authority" name="authority">
             <option value="0">一般</option>
             <option value="1">管理者</option>
         </select><br>

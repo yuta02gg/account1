@@ -54,62 +54,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
     } catch(PDOException $e) {
         echo "エラーが発生したためアカウント登録できません: " . $e->getMessage();
     }
-} else if (!isset($_SESSION['family_name'])) {
-    // セッションがない場合は登録フォームにリダイレクト
-    header("Location: regist.php");
-    exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>アカウント登録完了</title>
-    <style type="text/css">
+    <title>アカウント登録完了画面</title>
+    <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f9f9f9;
-            margin: 0;
         }
         .container {
+            width: 80%;
+            margin: 0 auto;
             text-align: center;
-            background-color: white;
-            padding: 50px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+        .header, .footer {
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
         }
-        button {
+        .header {
+            border-top: 1px solid #ddd;
+        }
+        .main {
+            padding: 50px 0;
+        }
+        .main p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        .button {
+            display: inline-block;
             padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
             font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>登録完了しました</h1>
-        <a href="diworks.html">
-            <button>TOPページへ戻る</button>
-        </a>
+        <div class="header">
+            <h1>アカウント登録完了画面</h1>
+        </div>
+        <div class="main">
+            <p>登録完了しました</p>
+            <a class="button" href="index.html">TOPページへ戻る</a>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Your Company</p>
+        </div>
     </div>
 </body>
 </html>

@@ -112,6 +112,7 @@
 
         <label for="password">パスワード</label>
         <input type="password" id="password" name="password" maxlength="10">
+        <input type="checkbox" id="show_password"> パスワードを表示
 
         <label>性別</label>
         <input type="radio" name="gender" value="0" checked> 男
@@ -187,7 +188,18 @@
         <button type="submit">確認する</button>
     </form>
     <div class="footer">
-            <p>フッター</p>
+        <p>フッター</p>
     </div>
+
+    <script>
+        document.getElementById('show_password').addEventListener('change', function() {
+            const passwordField = document.getElementById('password');
+            if (this.checked) {
+                passwordField.type = 'text';
+            } else {
+                passwordField.type = 'password';
+            }
+        });
+    </script>
 </body>
 </html>

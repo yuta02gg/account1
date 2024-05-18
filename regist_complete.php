@@ -17,15 +17,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
     $authority = $_SESSION['authority'];
 
     try {
-        $stmt = $conn->prepare("INSERT INTO accounts (family_name, last_name, family_name_kana, last_name_kana, mail, password, gender, postal_code, prefecture, address_1, address_2, authority) 
-                                VALUES (:family_name, :last_name, :family_name_kana, :last_name_kana, :mail, :password, :gender, :postal_code, :prefecture, :address_1, :address_2, :authority)");
+        $conn = getDbConnection(); // データベース接続を取得
+        $stmt = $conn->prepare("INSERT INTO accounts (family_name, last_name, family_name_kana, last_name_kana, mail, password, gender, postal_code, prefecture, address_1, address_2, authority, delete_flag, registered_time, update_time) 
+                                VALUES (:family_name, :last_name, :family_name_kana, :last_name_kana, :mail, :password, :gender, :postal_code, :prefecture, :address_1, :address_2, :authority, 0, NOW(), NOW())");
 
         $stmt->bindParam(':family_name', $family_name);
         $stmt->bindParam(':last_name', $last_name);
         $stmt->bindParam(':family_name_kana', $family_name_kana);
         $stmt->bindParam(':last_name_kana', $last_name_kana);
         $stmt->bindParam(':mail', $mail);
-        $stmt->bindParam(':password', password_hash($password, PASSWORD_DEFAULT));
+        $stmt->bindParam(':password', password_hash($password, PASSWORD_DEFAULT)); // パスワードはハッシュ化
         $stmt->bindParam(':gender', $gender);
         $stmt->bindParam(':postal_code', $postal_code);
         $stmt->bindParam(':prefecture', $prefecture);
@@ -36,22 +37,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         $stmt->execute();
 
         // セッションデータの削除
-        unset($_SESSION['family_name']);
-        unset($_SESSION['last_name']);
-        unset($_SESSION['family_name_kana']);
-        unset($_SESSION['last_name_kana']);
-        unset($_SESSION['mail']);
-        unset($_SESSION['password']);
-        unset($_SESSION['gender']);
-        unset($_SESSION['postal_code']);
-        unset($_SESSION['prefecture']);
-        unset($_SESSION['address_1']);
-        unset($_SESSION['address_2']);
-        unset($_SESSION['authority']);
+        session_unset();
+        session_destroy();
 
         header("Location: regist_complete.php");
         exit();
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         echo "エラーが発生したためアカウント登録できません: " . $e->getMessage();
     }
 }
@@ -66,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         body {
             font-family: Arial, sans-serif;
         }
-     
         .header, .footer {
             padding: 20px;
             background-color: #f8f8f8;
@@ -77,18 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         }
         .main {
             padding: 50px 0;
-        }
-        .main p {
-            font-size: 50px;
-            margin-bottom: 30px;
-        }
-        .main a{
-            margin-left: 44%;
-        }
-        p{
             text-align: center;
         }
-        .button {
+        .main p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        .main a {
             display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
@@ -96,23 +81,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             background-color: #007bff;
             text-decoration: none;
             border-radius: 5px;
-            
+        }
+        .main a:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="header">
-            <p>ナビゲーションバー</p>
+        <p>ナビゲーションバー</p>
     </div>
     <div class="container">  
         <h1>アカウント登録完了画面</h1>
         <div class="main">
             <p>登録完了しました</p>
-            <a class="button" href="index.html">TOPページへ戻る</a>
+            <a href="index.html">TOPページへ戻る</a>
         </div>
     </div>
     <div class="footer">
-            <p>フッター</p>
+        <p>フッター</p>
     </div>
 </body>
 </html>

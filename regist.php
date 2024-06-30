@@ -60,11 +60,12 @@
                 { name: 'last_name', displayName: '名前（名）', pattern: /^[ぁ-ん一-龠]+$/, errorMessage: '名前（名）は日本語の漢字またはひらがなで入力してください。' },
                 { name: 'family_name_kana', displayName: 'カナ（姓）', pattern: /^[ァ-ヶー]+$/, errorMessage: 'カナ（姓）はカタカナで入力してください。' },
                 { name: 'last_name_kana', displayName: 'カナ（名）', pattern: /^[ァ-ヶー]+$/, errorMessage: 'カナ（名）はカタカナで入力してください。' },
-                { name: 'mail', displayName: 'メールアドレス', pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, errorMessage: '有効なメールアドレスを入力してください。' },
+                { name: 'mail', displayName: 'メールアドレス', pattern: /^[a-zA-Z0-9.-@]+$/, errorMessage: '有効なメールアドレスを入力してください。' },
                 { name: 'password', displayName: 'パスワード', pattern: /^[a-zA-Z0-9]+$/, errorMessage: 'パスワードは英数字で入力してください。' },
                 { name: 'postal_code', displayName: '郵便番号', pattern: /^[0-9]{7}$/, errorMessage: '郵便番号は7桁の数字で入力してください。' },
-                { name: 'address_1', displayName: '住所（市区町村）', pattern: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/, errorMessage: '住所（市区町村）は有効な形式で入力してください。' },
-                { name: 'address_2', displayName: '住所（番地）', pattern: /^[ぁ-んァ-ヶ一-龠0-9- ]+$/, errorMessage: '住所（番地）は有効な形式で入力してください。' }
+                { name: 'address_1', displayName: '住所（市区町村）', pattern: /^[ぁ-んァ-ヶ一-龠0-9０-９- ]+$/, errorMessage: '住所（市区町村）は有効な形式で入力してください。'},
+                { name: 'address_2', displayName: '住所（番地）', pattern: /^[ぁ-んァ-ヶ一-龠0-9０-９- ]+$/, errorMessage: '住所（番地）は有効な形式で入力してください。' }
+
             ];
 
             requiredFields.forEach(field => {
@@ -84,6 +85,16 @@
                     isValid = false;
                 }
             });
+            // 都道府県のチェック
+            const prefecture = document.forms['registForm']['prefecture'].value;
+            const prefectureElement = document.forms['registForm']['prefecture'];
+            if (!prefecture) {
+              const error = document.createElement('div');
+              error.className = 'error';
+              error.innerText = '住所（都道府県）が未選択です。';
+              prefectureElement.parentElement.insertBefore(error, prefectureElement.nextSibling);
+              isValid = false;
+            }
 
             return isValid;
         }

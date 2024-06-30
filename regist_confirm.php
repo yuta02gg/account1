@@ -1,5 +1,5 @@
 <?php
-include 'includes/db.php';
+include 'db.php';
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -20,6 +20,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 
+// リロード時にセッションデータをリセット
+if ($_SERVER["REQUEST_METHOD"] === "GET" && !isset($_SERVER['HTTP_REFERER'])) {
+    session_unset();
+}
+
 // セッション変数のチェックと取得
 $family_name = isset($_SESSION['family_name']) ? $_SESSION['family_name'] : '';
 $last_name = isset($_SESSION['last_name']) ? $_SESSION['last_name'] : '';
@@ -34,8 +39,9 @@ $address_1 = isset($_SESSION['address_1']) ? $_SESSION['address_1'] : '';
 $address_2 = isset($_SESSION['address_2']) ? $_SESSION['address_2'] : '';
 $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
 
+// パスワードを●でマスクする
+$masked_password = str_repeat('●', strlen($password));
 ?>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -96,51 +102,51 @@ $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
     <div class="container">
         <div class="data">
             <label>名前（姓）</label>
-            <span><?php echo htmlspecialchars($family_name); ?></span>
+            <span><?php echo htmlspecialchars($family_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>名前（名）</label>
-            <span><?php echo htmlspecialchars($last_name); ?></span>
+            <span><?php echo htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>カナ（姓）</label>
-            <span><?php echo htmlspecialchars($family_name_kana); ?></span>
+            <span><?php echo htmlspecialchars($family_name_kana, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>カナ（名）</label>
-            <span><?php echo htmlspecialchars($last_name_kana); ?></span>
+            <span><?php echo htmlspecialchars($last_name_kana, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>メールアドレス</label>
-            <span><?php echo htmlspecialchars($mail); ?></span>
+            <span><?php echo htmlspecialchars($mail, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>パスワード</label>
-            <span>********</span>
+            <span><?php echo htmlspecialchars($masked_password, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>性別</label>
-            <span><?php echo $gender == 0 ? "男" : "女"; ?></span>
+            <span><?php echo $gender == '0' ? "男" : ($gender == '1' ? "女" : ""); ?></span>
         </div>
         <div class="data">
             <label>郵便番号</label>
-            <span><?php echo htmlspecialchars($postal_code); ?></span>
+            <span><?php echo htmlspecialchars($postal_code, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>住所（都道府県）</label>
-            <span><?php echo htmlspecialchars($prefecture); ?></span>
+            <span><?php echo htmlspecialchars($prefecture, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>住所（市区町村）</label>
-            <span><?php echo htmlspecialchars($address_1); ?></span>
+            <span><?php echo htmlspecialchars($address_1, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>住所（番地）</label>
-            <span><?php echo htmlspecialchars($address_2); ?></span>
+            <span><?php echo htmlspecialchars($address_2, ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="data">
             <label>アカウント権限</label>
-            <span><?php echo $authority == 0 ? "一般" : "管理者"; ?></span>
+            <span><?php echo $authority == '0' ? "一般" : ($authority == '1' ? "管理者" : ""); ?></span>
         </div>
 
         <div class="buttons">
@@ -153,7 +159,7 @@ $authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
         </div>     
     </div>
     <div class="footer">
-            <p>フッター</p>
+        <p>フッター</p>
     </div>
 </body>
 </html>

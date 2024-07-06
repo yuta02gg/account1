@@ -10,7 +10,11 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_tok
 }
 
 // POSTパラメータからアカウントIDを取得
-$id = $_POST['id'];
+$id = $_POST['id'] ?? null;
+
+if ($id === null) {
+    die("ID is not set");
+}
 ?>
 
 <!DOCTYPE html>
@@ -24,7 +28,7 @@ $id = $_POST['id'];
         body {
             font-family: Arial, sans-serif;
         }
-        p {
+        p{
             text-align: center;
         }
         .header, .footer {
@@ -33,12 +37,13 @@ $id = $_POST['id'];
             border-bottom: 1px solid #ddd;
         }
         .container {
-            margin: 0 auto;
+            width: 300px;
+            margin: 20px auto;
+            text-align: center;
         }
         h1 {
             color: #333;
-            font-size: 35px;
-            text-align: center;
+            font-size: 20px;
         }
         .button-group {
             display: flex;
@@ -70,11 +75,12 @@ $id = $_POST['id'];
     <div class="header">
         <p>ナビゲーションバー</p>
     </div>
-    <h2>アカウント削除画面</h2>
+    <h2>アカウント削除確認画面</h2>
     <div class="container">
         <h1>本当に削除してよろしいですか？</h1>
         <div class="button-group">
             <form action="delete.php" method="GET">
+                <input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="submit" class="back-button">前に戻る</button>
             </form>
             <form action="delete_complete.php" method="POST">
@@ -85,7 +91,7 @@ $id = $_POST['id'];
         </div>
     </div>
     <div class="footer">
-      <p>フッター</p>
+        <p>フッター</p>
     </div> 
 </body>
 </html>

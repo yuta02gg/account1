@@ -10,31 +10,31 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 // URLパラメータからアカウントIDを取得
-$id = $_GET['id'];
+$id = $_GET['id'] ?? null;
 
 // アカウントIDが指定されているか確認
-if (isset($id)) {
-    try {
-        // データベース接続を確立
-        $pdo = getDbConnection();
-
-        // アカウント情報を取得するSQLクエリを準備
-        $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = ?");
-        
-        // パラメータをバインド
-        $stmt->execute([$id]);
-
-        // 結果を取得
-        $account = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$account) {
-            throw new Exception("No account found with ID $id");
-        }
-    } catch (Exception $e) {
-        die("Error: " . $e->getMessage());
-    }
-} else {
+if ($id === null) {
     die("ID is not set");
+}
+
+try {
+    // データベース接続を確立
+    $pdo = getDbConnection();
+
+    // アカウント情報を取得するSQLクエリを準備
+    $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = ?");
+    
+    // パラメータをバインド
+    $stmt->execute([$id]);
+
+    // 結果を取得
+    $account = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$account) {
+        throw new Exception("No account found with ID $id");
+    }
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
 }
 
 // パスワードを●でマスクする

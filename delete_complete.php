@@ -10,12 +10,12 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_tok
 }
 
 // POSTパラメータからアカウントIDを取得
-$id = $_POST['id'];
+$id = $_POST['id'] ?? null;
 
 $error_message = '';
 $success_message = '';
 
-if (isset($id)) {
+if ($id !== null) {
     try {
         // データベース接続を確立
         $pdo = getDbConnection();
@@ -25,9 +25,6 @@ if (isset($id)) {
         
         // パラメータをバインド
         $stmt->execute([$id]);
-
-        // ステートメントを閉じる
-        $stmt->closeCursor();
 
         // セッション変数をリセット
         session_unset();
@@ -44,7 +41,7 @@ if (isset($id)) {
         $error_message = "エラーが発生したためアカウント削除できません。";
     }
 } else {
-    $error_message = "エラーが発生したためアカウント削除できません。";
+    $error_message = "IDが設定されていません。";
 }
 ?>
 

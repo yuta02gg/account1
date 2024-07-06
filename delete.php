@@ -36,9 +36,6 @@ try {
 } catch (Exception $e) {
     die("Error: " . $e->getMessage());
 }
-
-// パスワードを●でマスクする
-$masked_password = str_repeat('●', 10); // 固定長のマスク表示にしています
 ?>
 
 <!DOCTYPE html>
@@ -61,7 +58,7 @@ $masked_password = str_repeat('●', 10); // 固定長のマスク表示にし�
             text-align: center;
         }
         .container {
-            width: 300px;
+            width: 330px;
             margin: 0 auto;
         }
         .data {
@@ -89,8 +86,15 @@ $masked_password = str_repeat('●', 10); // 固定長のマスク表示にし�
         }
         .buttons {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             margin-top: 20px;
+        }
+        .back-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .back-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -123,7 +127,7 @@ $masked_password = str_repeat('●', 10); // 固定長のマスク表示にし�
             </div>
             <div class="data">
                 <label>パスワード</label>
-                <span><?php echo htmlspecialchars($masked_password, ENT_QUOTES, 'UTF-8'); ?></span>
+                <span>ハッシュ化されているので表示できません</span>
             </div>
             <div class="data">
                 <label>性別</label>
@@ -152,6 +156,7 @@ $masked_password = str_repeat('●', 10); // 固定長のマスク表示にし�
             <input type="hidden" name="id" value="<?php echo htmlspecialchars($account['id'], ENT_QUOTES, 'UTF-8'); ?>">
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <div class="buttons">
+                <button type="button" class="back-button" onclick="history.back()">前に戻る</button>
                 <button type="submit">確認する</button>
             </div>
         </form>

@@ -29,9 +29,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         try {
             $conn = getDbConnection();
-            $stmt = $conn->prepare("UPDATE accounts SET family_name = ?, last_name = ?, family_name_kana = ?, last_name_kana = ?, mail = ?, password = ?, gender = ?, postal_code = ?, prefecture = ?, address_1 = ?, address_2 = ?, authority = ? WHERE id = ?");
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt->execute([$family_name, $last_name, $family_name_kana, $last_name_kana, $mail, $hashed_password, $gender, $postal_code, $prefecture, $address_1, $address_2, $authority, $id]);
+
+            // パスワードが未入力の場合はパスワード以外を更新
+            if (empty($password)) {
+                $stmt = $conn->prepare("UPDATE accounts SET family_name = ?, last_name = ?, family_name_kana = ?, last_name_kana = ?, mail = ?, gender = ?, postal_code = ?, prefecture = ?, address_1 = ?, address_2 = ?, authority = ? WHERE id = ?");
+                $stmt->execute([$family_name, $last_name, $family_name_kana, $last_name_kana, $mail, $gender, $postal_code, $prefecture, $address_1, $address_2, $authority, $id]);
+            } else {
+                // パスワードが入力されている場合はハッシュ化して更新
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $conn->prepare("UPDATE accounts SET family_name = ?, last_name = ?, family_name_kana = ?, last_name_kana = ?, mail = ?, password = ?, gender = ?, postal_code = ?, prefecture = ?, address_1 = ?, address_2 = ?, authority = ? WHERE id = ?");
+                $stmt->execute([$family_name, $last_name, $family_name_kana, $last_name_kana, $mail, $hashed_password, $gender, $postal_code, $prefecture, $address_1, $address_2, $authority, $id]);
+            }
 
             // 登録成功
             $_SESSION = []; // セッションデータのクリア

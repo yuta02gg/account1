@@ -84,6 +84,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             padding: 20px;
             background-color: #f8f8f8;
             border-bottom: 1px solid #ddd;
+            
+        }
+        p {
+            text-align: center;
         }
         .header {
             border-top: 1px solid #ddd;

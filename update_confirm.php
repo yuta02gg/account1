@@ -123,7 +123,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="data">
             <label>パスワード</label>
-            <span><?php echo str_repeat('●', strlen($_SESSION['password'])); ?></span>
+            <span>
+                <?php 
+                if (empty($_SESSION['password'])) {
+                    echo "変更なし";
+                } else {
+                    echo str_repeat('●', strlen($_SESSION['password'])); 
+                }
+                ?>
+            </span>
         </div>
         <div class="data">
             <label>性別</label>

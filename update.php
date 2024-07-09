@@ -151,8 +151,8 @@ if (empty($_SESSION['csrf_token'])) {
             <input type="text" id="last_name_kana" name="last_name_kana" maxlength="10" value="<?php echo htmlspecialchars($_SESSION['last_name_kana'] ?? $account['last_name_kana'], ENT_QUOTES, 'UTF-8'); ?>">
             <label for="mail">メールアドレス</label>
             <input type="email" id="mail" name="mail" maxlength="100" value="<?php echo htmlspecialchars($_SESSION['mail'] ?? $account['mail'], ENT_QUOTES, 'UTF-8'); ?>">
-            <label for="password">パスワード（変更する場合は入力してください）</label>
-            <input type="password" id="password" name="password" maxlength="10" placeholder="ハッシュ化されているので表示できません" value="<?php echo htmlspecialchars($_SESSION['password'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" maxlength="10" placeholder="変更する場合は入力してください" value="<?php echo htmlspecialchars($_SESSION['password'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             <input type="checkbox" id="show_password"> パスワードを表示
             <label>性別</label>
             <input type="radio" name="gender" value="0" <?php echo ($_SESSION['gender'] ?? $account['gender']) == 0 ? 'checked' : ''; ?>> 男

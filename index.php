@@ -1,3 +1,8 @@
+<?php
+session_start();
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -138,8 +143,10 @@
             <li><a href="#">登録フォーム</a></li>
             <li><a href="#">問い合わせ</a></li>
             <li><a href="#">その他</a></li>
-            <li><a href="regist.php">アカウント登録</a></li> 
-            <li><a href="list.php">アカウント一覧</a></li>
+            <?php if ($role === 'admin'): ?>
+                <li><a href="regist.php">アカウント登録</a></li>
+                <li><a href="list.php">アカウント一覧</a></li>
+            <?php endif; ?>
         </ul>
     </header>
 

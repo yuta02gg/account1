@@ -2,6 +2,9 @@
 include 'db.php';
 session_start();
 
+// ログインチェックと権限チェック
+
+
 try {
     $conn = getDbConnection();
     $stmt = $conn->query("SELECT * FROM accounts ORDER BY id DESC");

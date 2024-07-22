@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             <?php elseif ($success_message): ?>
                 <p class="success"><?php echo htmlspecialchars($success_message, ENT_QUOTES, 'UTF-8'); ?></p>
             <?php endif; ?>
-            <a href="index.html">TOPページへ戻る</a>
+            <a href="index.php">TOPページへ戻る</a>
         </div>
     </div>
     <div class="footer">

@@ -112,7 +112,7 @@ if ($id !== null) {
             <h1 class="success"><?php echo htmlspecialchars($success_message, ENT_QUOTES, 'UTF-8'); ?></h1>
         <?php endif; ?>
         <div class="button-group">
-            <button onclick="location.href='index.html'">TOPページへ戻る</button>
+            <button onclick="location.href='index.php'">TOPページへ戻る</button>
         </div>
     </div>
     <div class="footer">

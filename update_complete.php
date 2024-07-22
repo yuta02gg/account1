@@ -134,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php elseif ($success_message): ?>
             <p class="message"><?php echo htmlspecialchars($success_message, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
-        <a href="index.html">TOPページへ戻る</a>
+        <a href="index.php">TOPページへ戻る</a>
     </div>
     <div class="footer">
         <p>フッター</p>

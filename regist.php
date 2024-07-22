@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
+    echo "このページにアクセスする権限がありません。";
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>

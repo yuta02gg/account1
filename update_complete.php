@@ -55,14 +55,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } catch (PDOException $e) {
             // データベースエラーが発生した場合
             error_log("Database error: " . $e->getMessage()); // エラーメッセージをログに記録
-            $error_message = "エラーが発生したためアカウントを更新できません。";
+            $error_message = "エラーが発生したためアカウント更新できません。";
         } catch (Exception $e) {
             // その他のエラーが発生した場合
             error_log("General error: " . $e->getMessage()); // エラーメッセージをログに記録
-            $error_message = "エラーが発生したためアカウントを更新できません。";
+            $error_message = "エラーが発生したためアカウント更新できません。";
         }
     } else {
-        $error_message = "エラーが発生したためアカウントを更新できません。";
+        $error_message = "エラーが発生したためアカウント更新できません。";
     }
 }
 ?>

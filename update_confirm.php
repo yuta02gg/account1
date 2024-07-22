@@ -47,21 +47,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-align: center;
         }
         .container {
-            width: 300px;
+            width: 360px;
             margin: 20px auto;
         }
         .data {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
         .data label {
-            display: block;
             font-weight: bold;
+            width: 40%;
         }
         .data span {
-            display: block;
+            width: 60%;
             padding: 5px;
             background-color: #f2f2f2;
-            margin-top: 5px;
         }
         .button-group {
             display: flex;

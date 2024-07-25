@@ -1,40 +1,33 @@
 <?php
 session_start();
+require_once 'db.php';
 
-// db.phpをインクルードしてデータベース接続を確立
-include('db.php');
-
-// CSRFトークンを生成
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
 }
 
-// URLパラメータからアカウントIDを取得
-$id = $_GET['id'] ?? null;
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
 
-// アカウントIDが指定されているか確認
-if ($id === null) {
-    die("ID is not set");
-}
+    try {
+        $conn = getDbConnection();
+        $stmt = $conn->prepare("SELECT * FROM accounts WHERE id = ?");
+        $stmt->execute([$id]);
+        $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
-try {
-    // データベース接続を確立
-    $pdo = getDbConnection();
-
-    // アカウント情報を取得するSQLクエリを準備
-    $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = ?");
-    
-    // パラメータをバインド
-    $stmt->execute([$id]);
-
-    // 結果を取得
-    $account = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$account) {
-        throw new Exception("No account found with ID $id");
+        if (!$account) {
+            echo 'アカウントが見つかりませんでした。';
+            exit;
+        }
+    } catch (PDOException $e) {
+        echo 'エラーが発生しました: ' . $e->getMessage();
+        exit;
     }
-} catch (Exception $e) {
-    die("Error: " . $e->getMessage());
+} else {
+    echo 'IDが指定されていません。';
+    exit;
 }
 ?>
 
@@ -44,7 +37,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>アカウント削除画面</title>
+    <title>アカウント削除確認画面</title>
     <style type="text/css">
         body {
             font-family: Arial, sans-serif;
@@ -102,28 +95,28 @@ try {
     <div class="header">
         <p>ナビゲーションバー</p>
     </div>
-    <h2>アカウント削除画面</h2>
+    <h2>アカウント削除確認画面</h2>
     <div class="container">
         <form action="delete_confirm.php" method="POST">
             <div class="data">
                 <label>名前（姓）</label>
-                <span><?php echo htmlspecialchars($account['family_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['family_name'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>名前（名）</label>
-                <span><?php echo htmlspecialchars($account['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['last_name'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>カナ（姓）</label>
-                <span><?php echo htmlspecialchars($account['family_name_kana'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['family_name_kana'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>カナ（名）</label>
-                <span><?php echo htmlspecialchars($account['last_name_kana'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['last_name_kana'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>メールアドレス</label>
-                <span><?php echo htmlspecialchars($account['mail'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['mail'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>パスワード</label>
@@ -131,33 +124,32 @@ try {
             </div>
             <div class="data">
                 <label>性別</label>
-                <span><?php echo ($account['gender'] ?? 0) == 0 ? '男' : '女'; ?></span>
+                <span><?php echo $account['gender'] == 0 ? '男' : '女'; ?></span>
             </div>
             <div class="data">
                 <label>郵便番号</label>
-                <span><?php echo htmlspecialchars($account['postal_code'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['postal_code'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>住所（都道府県）</label>
-                <span><?php echo htmlspecialchars($account['prefecture'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['prefecture'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>住所（市区町村）</label>
-                <span><?php echo htmlspecialchars($account['address_1'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['address_1'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>住所（番地）</label>
-                <span><?php echo htmlspecialchars($account['address_2'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                <span><?php echo htmlspecialchars($account['address_2'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="data">
                 <label>アカウント権限</label>
-                <span><?php echo ($account['authority'] ?? 0) == 0 ? '一般' : '管理者'; ?></span>
+                <span><?php echo $account['authority'] == 0 ? '一般' : '管理者'; ?></span>
             </div>
             <input type="hidden" name="id" value="<?php echo htmlspecialchars($account['id'], ENT_QUOTES, 'UTF-8'); ?>">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <div class="buttons">
                 <button type="button" class="back-button" onclick="history.back()">前に戻る</button>
-                <button type="submit">確認する</button>
+                <button type="submit">削除する</button>
             </div>
         </form>
     </div>

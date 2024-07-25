@@ -1,9 +1,14 @@
 <?php
-include 'db.php';
 session_start();
+require_once 'db.php';
 
-// ログインチェックと権限チェック
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
+}
 
+$error_message = '';
 
 try {
     $conn = getDbConnection();
@@ -80,7 +85,7 @@ try {
         <h1>アカウント一覧</h1>
     </div>
     <div class="container">
-        <?php if (isset($error_message)): ?>
+        <?php if ($error_message): ?>
             <p class="error"><?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
         <table>

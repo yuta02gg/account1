@@ -1,21 +1,40 @@
 <?php
 session_start();
-include 'db.php';
+require_once 'db.php';
 
-$id = $_GET['id'] ?? $_SESSION['id'];
-$pdo = getDbConnection();
-$stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = ?");
-$stmt->execute([$id]);
-$account = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$account) {
-    die("アカウントが見つかりません。");
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
 }
 
-// CSRFトークンの生成
+// CSRFトークンを生成してセッションに保存
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+$error_message = '';
+$success_message = '';
+
+// IDの取得とバリデーション
+$id = $_GET['id'] ?? null;
+if ($id === null) {
+    die("IDが指定されていません。");
+}
+
+// データベースから現在のユーザー情報を取得
+try {
+    $conn = getDbConnection();
+    $stmt = $conn->prepare("SELECT * FROM accounts WHERE id = ?");
+    $stmt->execute([$id]);
+    $account = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$account) {
+        die("アカウントが見つかりません。");
+    }
+} catch (PDOException $e) {
+    $error_message = "エラーが発生したためアカウント情報を取得できません。";
+}
+
 ?>
 
 <!DOCTYPE html>

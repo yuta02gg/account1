@@ -1,12 +1,10 @@
 <?php
 session_start();
+require_once 'db.php';
 
-// db.phpをインクルードしてデータベース接続を確立
-include('db.php');
-
-// CSRFトークンの確認
-if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    die("Invalid CSRF token");
+// CSRFトークンを生成してセッションに保存
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // POSTパラメータからアカウントIDを取得
@@ -28,7 +26,7 @@ if ($id === null) {
         body {
             font-family: Arial, sans-serif;
         }
-        p{
+        p {
             text-align: center;
         }
         .header, .footer {
@@ -79,8 +77,7 @@ if ($id === null) {
     <div class="container">
         <h1>本当に削除してよろしいですか？</h1>
         <div class="button-group">
-            <form action="delete.php" method="GET">
-                <input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES, 'UTF-8'); ?>">
+            <form action="list.php" method="GET">
                 <button type="submit" class="back-button">前に戻る</button>
             </form>
             <form action="delete_complete.php" method="POST">

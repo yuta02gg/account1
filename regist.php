@@ -1,8 +1,27 @@
 <?php
 session_start();
-if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
-    echo "このページにアクセスする権限がありません。";
-    exit();
+require_once 'db.php';
+
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $authority = isset($_POST['authority']) ? 1 : 0;
+
+    $sql = 'INSERT INTO users (username, password, authority) VALUES (:username, :password, :authority)';
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':username', $username);
+    $stmt->bindParam(':password', $password);
+    $stmt->bindParam(':authority', $authority);
+    $stmt->execute();
+
+    header('Location: list.php');
+    exit;
 }
 ?>
 

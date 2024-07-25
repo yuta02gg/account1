@@ -1,42 +1,35 @@
 <?php
 session_start();
+require_once 'db.php';
+
 $error_message = '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $mail = $_POST['mail'];
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $mail = $_POST['mail'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    // データベース接続
-    include 'db.php';
+    if (empty($mail) || empty($password)) {
+        $error_message = 'メールアドレスとパスワードを入力してください。';
+    } else {
+        try {
+            $dbh = getDbConnection();
 
-    try {
-        $conn = getDbConnection();
-        // SQLクエリの実行
-        $sql = "SELECT * FROM accounts WHERE mail = :mail";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':mail', $mail);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $sql = 'SELECT password, authority FROM accounts WHERE mail = :mail';
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':mail', $mail);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user) {
-            // ユーザーが見つかった場合
-            if (password_verify($password, $user['password'])) {
-                // パスワードが正しい場合
-                $_SESSION['loggedin'] = true;
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['role'] = $user['role'];
-                header("Location: index.php");
-                exit();
+            if ($user && password_verify($password, $user['password'])) {
+                $_SESSION['authority'] = $user['authority'];
+                header('Location: index.php');
+                exit;
             } else {
-                // パスワードが間違っている場合
-                $error_message = "メールアドレスまたはパスワードが間違っています。";
+                $error_message = 'メールアドレスまたはパスワードが正しくありません。';
             }
-        } else {
-            // ユーザーが見つからない場合
-            $error_message = "メールアドレスまたはパスワードが間違っています。";
+        } catch (PDOException $e) {
+            $error_message = 'エラーが発生したためログイン情報を取得できません。';
         }
-    } catch (Exception $e) {
-        $error_message = "エラーが発生したためログイン情報を取得できません。" . $e->getMessage();
     }
 }
 ?>
@@ -45,22 +38,89 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン</title>
+    <title>ログイン画面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header, .footer {
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        .container {
+            width: 450px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        h2 {
+            text-align: left;
+            margin-left: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            width: 140px;
+            font-weight: bold;
+            text-align: right;
+            margin-right: 10px;
+        }
+        .form-group input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            margin-bottom: 20px;
+            text-align: left;
+            margin-left: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h2>ログイン</h2>
-    <?php
-    if (!empty($error_message)) {
-        echo '<p style="color: red;">' . $error_message . '</p>';
-    }
-    ?>
-    <form action="login.php" method="post">
-        <label for="mail">メールアドレス:</label>
-        <input type="mail" id="mail" name="mail" required><br>
-        <label for="password">パスワード:</label>
-        <input type="password" id="password" name="password" required><br>
-        <button type="submit">ログイン</button>
-    </form>
+    <div class="header">
+        <p>ナビゲーションバー</p>
+    </div>
+    <h2>ログイン画面</h2>
+    <div class="container">
+        <?php if ($error_message): ?>
+            <p class="error"><?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?></p>
+        <?php endif; ?>
+        <form action="login.php" method="POST">
+            <div class="form-group">
+                <label for="mail">メールアドレス:</label>
+                <input type="email" id="mail" name="mail" required>
+            </div>
+            <div class="form-group">
+                <label for="password">パスワード:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">ログイン</button>
+        </form>
+    </div>
+    <div class="footer">
+        <p>フッター</p>
+    </div>
 </body>
 </html>

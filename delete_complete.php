@@ -1,8 +1,12 @@
 <?php
 session_start();
+require_once 'db.php';
 
-// db.phpをインクルードしてデータベース接続を確立
-include('db.php');
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
+}
 
 // CSRFトークンの確認
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
@@ -25,9 +29,6 @@ if ($id !== null) {
         
         // パラメータをバインド
         $stmt->execute([$id]);
-
-        // セッション変数をリセット
-        session_unset();
 
         // 削除成功
         $success_message = "削除完了しました";
@@ -116,7 +117,7 @@ if ($id !== null) {
         </div>
     </div>
     <div class="footer">
-      <p>フッター</p>
+        <p>フッター</p>
     </div> 
 </body>
 </html>

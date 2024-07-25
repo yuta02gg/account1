@@ -1,6 +1,6 @@
 <?php
 session_start();
-$role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
+$authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : 0;
 ?>
 
 <!DOCTYPE html>
@@ -143,7 +143,7 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
             <li><a href="#">登録フォーム</a></li>
             <li><a href="#">問い合わせ</a></li>
             <li><a href="#">その他</a></li>
-            <?php if ($role === 'admin'): ?>
+            <?php if ($authority === 1): ?>
                 <li><a href="regist.php">アカウント登録</a></li>
                 <li><a href="list.php">アカウント一覧</a></li>
             <?php endif; ?>

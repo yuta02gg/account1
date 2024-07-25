@@ -30,8 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         $stmt->bindParam(':family_name_kana', $family_name_kana);
         $stmt->bindParam(':last_name_kana', $last_name_kana);
         $stmt->bindParam(':mail', $mail);
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT); // 一時変数にハッシュ化されたパスワードを格納
-        $stmt->bindParam(':password', $hashed_password); // パスワードはハッシュ化
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT); // パスワードをハッシュ化
+        $stmt->bindParam(':password', $hashed_password);
         $stmt->bindParam(':gender', $gender);
         $stmt->bindParam(':postal_code', $postal_code);
         $stmt->bindParam(':prefecture', $prefecture);
@@ -41,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
 
         if ($stmt->execute()) {
             // 登録成功
+            echo 'ハッシュ化されたパスワード: ' . $hashed_password . '<br>';
             $_SESSION = []; // セッションデータのクリア
             if (ini_get("session.use_cookies")) {
                 $params = session_get_cookie_params();

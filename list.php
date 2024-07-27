@@ -14,14 +14,16 @@ $last_name = $_GET['last_name'] ?? '';
 $family_name_kana = $_GET['family_name_kana'] ?? '';
 $last_name_kana = $_GET['last_name_kana'] ?? '';
 $mail = $_GET['mail'] ?? '';
-$gender = $_GET['gender'] ?? '';
-$authority = $_GET['authority'] ?? '';
+$gender = isset($_GET['gender']) ? $_GET['gender'] : '0';
+$authority = isset($_GET['authority']) ? $_GET['authority'] : '0';
 
-$search_query = "";
+$search_query = "WHERE 1=1"; // デフォルトの検索クエリを設定
 $params = [];
 
+$show_results = false;
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
-    $search_query = "WHERE 1=1";
+    $show_results = true;
 
     if (!empty($family_name)) {
         $search_query .= " AND family_name LIKE :family_name";
@@ -60,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
 }
 
 $accounts = [];
-if (!empty($search_query)) {
+if ($show_results) {
     try {
         $conn = getDbConnection();
         $stmt = $conn->prepare("SELECT * FROM accounts $search_query ORDER BY id DESC");
@@ -172,6 +174,28 @@ if (!empty($search_query)) {
             background-color: #0056b3;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let genderHidden = document.getElementById('gender-hidden');
+            let radios = document.querySelectorAll('input[type=radio][name=gender-radio]');
+
+            radios.forEach(radio => {
+                radio.addEventListener('click', function() {
+                    if (this.checked && this.previousChecked) {
+                        this.checked = false;
+                        genderHidden.value = '';
+                    } else {
+                        genderHidden.value = this.value;
+                    }
+                    radios.forEach(r => r.previousChecked = false);
+                    this.previousChecked = this.checked;
+                });
+            });
+
+            // 初期値設定
+            genderHidden.value = document.querySelector('input[type=radio][name=gender-radio]:checked') ? document.querySelector('input[type=radio][name=gender-radio]:checked').value : '0';
+        });
+    </script>
 </head>
 <body>
     <div class="header">
@@ -179,6 +203,7 @@ if (!empty($search_query)) {
     </div>
     <div class="container">
         <form action="list.php" method="GET" class="search-form">
+            <input type="hidden" id="gender-hidden" name="gender" value="<?php echo htmlspecialchars($gender, ENT_QUOTES, 'UTF-8'); ?>">
             <table>
                 <tr>
                     <th><label for="family_name">名前（姓）:</label></th>
@@ -198,8 +223,8 @@ if (!empty($search_query)) {
                     <th>性別:</th>
                     <td>
                         <div class="radio-group">
-                            <label><input type="radio" name="gender" value="0" <?php if ($gender === '0') echo 'checked'; ?>> 男</label>
-                            <label><input type="radio" name="gender" value="1" <?php if ($gender === '1') echo 'checked'; ?>> 女</label>
+                            <label><input type="radio" name="gender-radio" value="0" <?php if ($gender === '0') echo 'checked'; ?>> 男</label>
+                            <label><input type="radio" name="gender-radio" value="1" <?php if ($gender === '1') echo 'checked'; ?>> 女</label>
                         </div>
                     </td>
                 </tr>
@@ -207,6 +232,7 @@ if (!empty($search_query)) {
                     <th><label for="authority">アカウント権限:</label></th>
                     <td>
                         <select id="authority" name="authority">
+                            <option value="" <?php if ($authority === '') echo 'selected'; ?>>選択なし</option>
                             <option value="0" <?php if ($authority === '0') echo 'selected'; ?>>一般</option>
                             <option value="1" <?php if ($authority === '1') echo 'selected'; ?>>管理者</option>
                         </select>
@@ -218,7 +244,7 @@ if (!empty($search_query)) {
         <?php if (isset($error_message)): ?>
             <p class="error"><?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
-        <?php if (!empty($accounts)): ?>
+        <?php if ($show_results): ?>
             <table>
                 <thead>
                     <tr>
@@ -238,31 +264,37 @@ if (!empty($search_query)) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($accounts as $account): ?>
+                    <?php if (!empty($accounts)): ?>
+                        <?php foreach ($accounts as $account): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($account['id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($account['family_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($account['last_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($account['family_name_kana'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($account['last_name_kana'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($account['mail'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo $account['gender'] == 0 ? "男" : "女"; ?></td>
+                                <td><?php echo $account['authority'] == 0 ? "一般" : "管理者"; ?></td>
+                                <td><?php echo $account['delete_flag'] == 0 ? "有効" : "無効"; ?></td>
+                                <td><?php echo htmlspecialchars(substr($account['registered_time'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars(substr($account['update_time'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button onclick="location.href='update.php?id=<?php echo $account['id']; ?>'">更新</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button onclick="location.href='delete.php?id=<?php echo $account['id']; ?>'">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($account['id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($account['family_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($account['last_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($account['family_name_kana'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($account['last_name_kana'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($account['mail'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo $account['gender'] == 0 ? "男" : "女"; ?></td>
-                            <td><?php echo $account['authority'] == 0 ? "一般" : "管理者"; ?></td>
-                            <td><?php echo $account['delete_flag'] == 0 ? "有効" : "無効"; ?></td>
-                            <td><?php echo htmlspecialchars(substr($account['registered_time'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars(substr($account['update_time'], 0, 10), ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button onclick="location.href='update.php?id=<?php echo $account['id']; ?>'">更新</button>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button onclick="location.href='delete.php?id=<?php echo $account['id']; ?>'">削除</button>
-                                </div>
-                            </td>
+                            <td colspan="13">該当するアカウントはありません。</td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         <?php endif; ?>

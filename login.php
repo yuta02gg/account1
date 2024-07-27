@@ -3,6 +3,7 @@ session_start();
 require_once 'db.php';
 
 $error_message = '';
+$mail = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mail = $_POST['mail'] ?? '';
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $error_message = 'メールアドレスまたはパスワードが正しくありません。';
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $error_message = 'エラーが発生したためログイン情報を取得できません。';
         }
     }
@@ -77,6 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        .form-group .toggle-password {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+        }
         button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -97,6 +105,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-left: 20px;
         }
     </style>
+    <script>
+        function togglePassword() {
+            var passwordInput = document.getElementById('password');
+            var toggleButton = document.getElementById('togglePassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = '非表示';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = '表示';
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="header">
@@ -110,11 +131,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="login.php" method="POST">
             <div class="form-group">
                 <label for="mail">メールアドレス:</label>
-                <input type="email" id="mail" name="mail" required>
+                <input type="email" id="mail" name="mail" maxlength="100" value="<?php echo htmlspecialchars($mail, ENT_QUOTES, 'UTF-8'); ?>" required>
             </div>
             <div class="form-group">
                 <label for="password">パスワード:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" maxlength="10" required>
+                <span class="toggle-password" id="togglePassword" onclick="togglePassword()">表示</span>
             </div>
             <button type="submit">ログイン</button>
         </form>

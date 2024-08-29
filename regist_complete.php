@@ -2,6 +2,12 @@
 include 'db.php';
 session_start();
 
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
+}
+
 // 初期化
 $error_message = '';
 $success_message = '';

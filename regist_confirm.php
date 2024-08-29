@@ -2,6 +2,12 @@
 include 'db.php';
 session_start();
 
+// 権限チェック
+if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
+    echo 'アクセスが拒否されました。';
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['family_name'] = $_POST['family_name'];
     $_SESSION['last_name'] = $_POST['last_name'];

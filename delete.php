@@ -37,7 +37,7 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>アカウント削除確認画面</title>
+    <title>アカウント削除画面</title>
     <style type="text/css">
         body {
             font-family: Arial, sans-serif;
@@ -95,7 +95,7 @@ if (isset($_GET['id'])) {
     <div class="header">
         <p>ナビゲーションバー</p>
     </div>
-    <h2>アカウント削除確認画面</h2>
+    <h2>アカウント削除画面</h2>
     <div class="container">
         <form action="delete_confirm.php" method="POST">
             <div class="data">

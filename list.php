@@ -14,8 +14,8 @@ $last_name = $_GET['last_name'] ?? '';
 $family_name_kana = $_GET['family_name_kana'] ?? '';
 $last_name_kana = $_GET['last_name_kana'] ?? '';
 $mail = $_GET['mail'] ?? '';
-$gender = isset($_GET['gender']) ? $_GET['gender'] : '0';
-$authority = isset($_GET['authority']) ? $_GET['authority'] : '0';
+$gender = isset($_GET['gender']) ? $_GET['gender'] : '';
+$authority = isset($_GET['authority']) ? $_GET['authority'] : '';
 
 $search_query = "WHERE 1=1"; // デフォルトの検索クエリを設定
 $params = [];
@@ -193,7 +193,7 @@ if ($show_results) {
             });
 
             // 初期値設定
-            genderHidden.value = document.querySelector('input[type=radio][name=gender-radio]:checked') ? document.querySelector('input[type=radio][name=gender-radio]:checked').value : '0';
+            genderHidden.value = document.querySelector('input[type=radio][name=gender-radio]:checked') ? document.querySelector('input[type=radio][name=gender-radio]:checked').value : '';
         });
     </script>
 </head>

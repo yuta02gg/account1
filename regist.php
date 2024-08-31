@@ -2,25 +2,9 @@
 session_start();
 require_once 'db.php';
 
-// 権限チェック
+// 管理者権限のチェック
 if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
     echo 'アクセスが拒否されました。';
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $authority = isset($_POST['authority']) ? 1 : 0;
-
-    $sql = 'INSERT INTO users (username, password, authority) VALUES (:username, :password, :authority)';
-    $stmt = $dbh->prepare($sql);
-    $stmt->bindParam(':username', $username);
-    $stmt->bindParam(':password', $password);
-    $stmt->bindParam(':authority', $authority);
-    $stmt->execute();
-
-    header('Location: list.php');
     exit;
 }
 ?>
@@ -41,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #f8f8f8;
             border-bottom: 1px solid #ddd;
         }
-        p{
+        p {
             text-align: center;
         }
         form {
@@ -92,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 { name: 'postal_code', displayName: '郵便番号', pattern: /^[0-9]{7}$/, errorMessage: '郵便番号は7桁の数字で入力してください。' },
                 { name: 'address_1', displayName: '住所（市区町村）', pattern: /^[ぁ-んァ-ヶ一-龠0-9０-９- ]+$/, errorMessage: '住所（市区町村）は有効な形式で入力してください。'},
                 { name: 'address_2', displayName: '住所（番地）', pattern: /^[ぁ-んァ-ヶ一-龠0-9０-９- ]+$/, errorMessage: '住所（番地）は有効な形式で入力してください。' }
-
             ];
 
             requiredFields.forEach(field => {
@@ -112,15 +95,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     isValid = false;
                 }
             });
+
             // 都道府県のチェック
             const prefecture = document.forms['registForm']['prefecture'].value;
             const prefectureElement = document.forms['registForm']['prefecture'];
             if (!prefecture) {
-              const error = document.createElement('div');
-              error.className = 'error';
-              error.innerText = '住所（都道府県）が未選択です。';
-              prefectureElement.parentElement.insertBefore(error, prefectureElement.nextSibling);
-              isValid = false;
+                const error = document.createElement('div');
+                error.className = 'error';
+                error.innerText = '住所（都道府県）が未選択です。';
+                prefectureElement.parentElement.insertBefore(error, prefectureElement.nextSibling);
+                isValid = false;
             }
 
             return isValid;

@@ -1,40 +1,41 @@
 <?php
 session_start();
-require_once 'db.php';
+include 'db.php';
 
 // 権限チェック
 if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
     echo 'アクセスが拒否されました。';
     exit;
 }
-
 // CSRFトークンを生成してセッションに保存
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$error_message = '';
-$success_message = '';
-
-// IDの取得とバリデーション
-$id = $_GET['id'] ?? null;
-if ($id === null) {
+// ユーザーIDを取得
+if (!isset($_GET['id'])) {
     die("IDが指定されていません。");
 }
 
-// データベースから現在のユーザー情報を取得
-try {
-    $conn = getDbConnection();
-    $stmt = $conn->prepare("SELECT * FROM accounts WHERE id = ?");
-    $stmt->execute([$id]);
-    $account = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$account) {
-        die("アカウントが見つかりません。");
-    }
-} catch (PDOException $e) {
-    $error_message = "エラーが発生したためアカウント情報を取得できません。";
-}
+$id = $_GET['id'];
 
+try {
+    $dbh = getDbConnection();
+
+    // データベースからユーザー情報を取得
+    $sql = 'SELECT * FROM accounts WHERE id = :id';
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    $account = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$account) {
+        die("指定されたIDのユーザーが見つかりません。");
+    }
+
+} catch (Exception $e) {
+    die("エラーが発生しました: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -194,9 +195,9 @@ try {
             <label for="address_2">住所（番地）</label>
             <input type="text" id="address_2" name="address_2" maxlength="100" value="<?php echo htmlspecialchars($_SESSION['address_2'] ?? $account['address_2'], ENT_QUOTES, 'UTF-8'); ?>">
             <label for="authority">アカウント権限</label>
-            <select id="authority" name="authority">
-                <option value="0" <?php echo ($_SESSION['authority'] ?? $account['authority']) == 0 ? 'selected' : ''; ?>>一般</option>
-                <option value="1" <?php echo ($_SESSION['authority'] ?? $account['authority']) == 1 ? 'selected' : ''; ?>>管理者</option>
+            <select id="authority" name="authority" required>
+                <option value="0" <?php echo $account['authority'] == 0 ? 'selected' : ''; ?>>一般</option>
+                <option value="1" <?php echo $account['authority'] == 1 ? 'selected' : ''; ?>>管理者</option>
             </select>
             <button type="submit">確認する</button>
         </form>

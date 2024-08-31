@@ -1,10 +1,6 @@
 <?php
-include 'db.php';
 session_start();
-
-// 初期化
-$error_message = '';
-$success_message = '';
+include 'db.php';
 
 // 権限チェック
 if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
@@ -18,60 +14,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Invalid CSRF token");
     }
 
-    if (isset($_SESSION['id'])) {
-        $id = $_SESSION['id'];
-        $family_name = $_SESSION['family_name'];
-        $last_name = $_SESSION['last_name'];
-        $family_name_kana = $_SESSION['family_name_kana'];
-        $last_name_kana = $_SESSION['last_name_kana'];
-        $mail = $_SESSION['mail'];
-        $password = $_SESSION['password'];
-        $gender = $_SESSION['gender'];
-        $postal_code = $_SESSION['postal_code'];
-        $prefecture = $_SESSION['prefecture'];
-        $address_1 = $_SESSION['address_1'];
-        $address_2 = $_SESSION['address_2'];
-        $authority = $_SESSION['authority'];
+    $id = $_POST['id'];
+    $family_name = $_POST['family_name'];
+    $last_name = $_POST['last_name'];
+    $family_name_kana = $_POST['family_name_kana'];
+    $last_name_kana = $_POST['last_name_kana'];
+    $mail = $_POST['mail'];
+    $password = $_POST['password'];
+    $gender = $_POST['gender'];
+    $postal_code = $_POST['postal_code'];
+    $prefecture = $_POST['prefecture'];
+    $address_1 = $_POST['address_1'];
+    $address_2 = $_POST['address_2'];
+    $authority = $_POST['authority'];
 
-        try {
-            $conn = getDbConnection();
+    try {
+        $dbh = getDbConnection();
 
-            // パスワードが未入力の場合はパスワード以外を更新
-            if (empty($password)) {
-                $stmt = $conn->prepare("UPDATE accounts SET family_name = ?, last_name = ?, family_name_kana = ?, last_name_kana = ?, mail = ?, gender = ?, postal_code = ?, prefecture = ?, address_1 = ?, address_2 = ?, authority = ? WHERE id = ?");
-                $stmt->execute([$family_name, $last_name, $family_name_kana, $last_name_kana, $mail, $gender, $postal_code, $prefecture, $address_1, $address_2, $authority, $id]);
-            } else {
-                // パスワードが入力されている場合はハッシュ化して更新
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE accounts SET family_name = ?, last_name = ?, family_name_kana = ?, last_name_kana = ?, mail = ?, password = ?, gender = ?, postal_code = ?, prefecture = ?, address_1 = ?, address_2 = ?, authority = ? WHERE id = ?");
-                $stmt->execute([$family_name, $last_name, $family_name_kana, $last_name_kana, $mail, $hashed_password, $gender, $postal_code, $prefecture, $address_1, $address_2, $authority, $id]);
-            }
-
-            // 登録成功
-            $_SESSION = []; // セッションデータのクリア
-            if (ini_get("session.use_cookies")) {
-                $params = session_get_cookie_params();
-                setcookie(session_name(), '', time() - 42000,
-                    $params["path"], $params["domain"],
-                    $params["secure"], $params["httponly"]
-                );
-            }
-            session_destroy();
-            $success_message = "更新完了しました";
-        } catch (PDOException $e) {
-            // データベースエラーが発生した場合
-            error_log("Database error: " . $e->getMessage()); // エラーメッセージをログに記録
-            $error_message = "エラーが発生したためアカウント更新できません。";
-        } catch (Exception $e) {
-            // その他のエラーが発生した場合
-            error_log("General error: " . $e->getMessage()); // エラーメッセージをログに記録
-            $error_message = "エラーが発生したためアカウント更新できません。";
+        // パスワードが空でない場合は更新
+        if (!empty($password)) {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "UPDATE accounts SET family_name = :family_name, last_name = :last_name, family_name_kana = :family_name_kana, 
+                    last_name_kana = :last_name_kana, mail = :mail, password = :password, gender = :gender, 
+                    postal_code = :postal_code, prefecture = :prefecture, address_1 = :address_1, address_2 = :address_2, 
+                    authority = :authority WHERE id = :id";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':password', $hashed_password);
+        } else {
+            // パスワードが空の場合、パスワードを更新しない
+            $sql = "UPDATE accounts SET family_name = :family_name, last_name = :last_name, family_name_kana = :family_name_kana, 
+                    last_name_kana = :last_name_kana, mail = :mail, gender = :gender, 
+                    postal_code = :postal_code, prefecture = :prefecture, address_1 = :address_1, address_2 = :address_2, 
+                    authority = :authority WHERE id = :id";
+            $stmt = $dbh->prepare($sql);
         }
-    } else {
-        $error_message = "エラーが発生したためアカウント更新できません。";
+
+        // 共通のパラメータバインド
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':family_name', $family_name);
+        $stmt->bindParam(':last_name', $last_name);
+        $stmt->bindParam(':family_name_kana', $family_name_kana);
+        $stmt->bindParam(':last_name_kana', $last_name_kana);
+        $stmt->bindParam(':mail', $mail);
+        $stmt->bindParam(':gender', $gender);
+        $stmt->bindParam(':postal_code', $postal_code);
+        $stmt->bindParam(':prefecture', $prefecture);
+        $stmt->bindParam(':address_1', $address_1);
+        $stmt->bindParam(':address_2', $address_2);
+        $stmt->bindParam(':authority', $authority);
+
+        $stmt->execute();
+
+        // 更新後、セッションに新しい権限を反映
+        $_SESSION['authority'] = $authority;
+
+        header('Location: success.php'); // 成功ページにリダイレクト
+        exit;
+    } catch (Exception $e) {
+        echo 'エラーが発生しました: ' . $e->getMessage();
     }
+} else {
+    die("Invalid request");
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">

@@ -12,22 +12,22 @@ if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
 $error_message = '';
 $success_message = '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
-    $family_name = $_SESSION['family_name'];
-    $last_name = $_SESSION['last_name'];
-    $family_name_kana = $_SESSION['family_name_kana'];
-    $last_name_kana = $_SESSION['last_name_kana'];
-    $mail = $_SESSION['mail'];
-    $password = $_SESSION['password'];
-    $gender = $_SESSION['gender'];
-    $postal_code = $_SESSION['postal_code'];
-    $prefecture = $_SESSION['prefecture'];
-    $address_1 = $_SESSION['address_1'];
-    $address_2 = $_SESSION['address_2'];
-    $authority = $_SESSION['authority'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $family_name = $_POST['family_name'];
+    $last_name = $_POST['last_name'];
+    $family_name_kana = $_POST['family_name_kana'];
+    $last_name_kana = $_POST['last_name_kana'];
+    $mail = $_POST['mail'];
+    $password = $_POST['password'];
+    $gender = $_POST['gender'];
+    $postal_code = $_POST['postal_code'];
+    $prefecture = $_POST['prefecture'];
+    $address_1 = $_POST['address_1'];
+    $address_2 = $_POST['address_2'];
+    $authority = $_POST['authority'];
 
     try {
-        $conn = getDbConnection(); // データベース接続を取得
+        $conn = getDbConnection();
         $stmt = $conn->prepare("INSERT INTO accounts (family_name, last_name, family_name_kana, last_name_kana, mail, password, gender, postal_code, prefecture, address_1, address_2, authority) 
                                 VALUES (:family_name, :last_name, :family_name_kana, :last_name_kana, :mail, :password, :gender, :postal_code, :prefecture, :address_1, :address_2, :authority)");
 
@@ -46,33 +46,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
         $stmt->bindParam(':authority', $authority);
 
         if ($stmt->execute()) {
-            // 登録成功
-            echo 'ハッシュ化されたパスワード: ' . $hashed_password . '<br>';
-            $_SESSION = []; // セッションデータのクリア
-            if (ini_get("session.use_cookies")) {
-                $params = session_get_cookie_params();
-                setcookie(session_name(), '', time() - 42000,
-                    $params["path"], $params["domain"],
-                    $params["secure"], $params["httponly"]
-                );
-            }
-            session_destroy();
             $success_message = "アカウント登録が完了しました。";
         } else {
-            // エラーが発生した場合
-            $error_message = "エラーが発生したためアカウント登録できません。";
+            $errorInfo = $stmt->errorInfo(); 
+            $error_message = "エラーが発生しました: " . htmlspecialchars($errorInfo[2]);
         }
     } catch (PDOException $e) {
-        // データベースエラーが発生した場合
-        error_log("Database error: " . $e->getMessage()); // エラーメッセージをログに記録
-        $error_message = "エラーが発生したためアカウント登録できません。";
+        error_log("Database error: " . $e->getMessage());
+        $error_message = "データベースエラーが発生しました: " . htmlspecialchars($e->getMessage());
     } catch (Exception $e) {
-        // その他のエラーが発生した場合
-        error_log("General error: " . $e->getMessage()); // エラーメッセージをログに記録
-        $error_message = "エラーが発生したためアカウント登録できません。";
+        error_log("General error: " . $e->getMessage());
+        $error_message = "エラーが発生しました: " . htmlspecialchars($e->getMessage());
     }
 } else {
-    $error_message = "エラーが発生したためアカウント登録できません。";
+    $error_message = "不正なリクエストです。";
 }
 ?>
 
@@ -91,13 +78,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['family_name'])) {
             padding: 20px;
             background-color: #f8f8f8;
             border-bottom: 1px solid #ddd;
-            
         }
         p {
             text-align: center;
-        }
-        .header {
-            border-top: 1px solid #ddd;
         }
         .main {
             padding: 50px 0;

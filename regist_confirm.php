@@ -1,6 +1,6 @@
 <?php
-include 'db.php';
 session_start();
+include 'db.php';
 
 // 権限チェック
 if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
@@ -9,45 +9,29 @@ if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $_SESSION['family_name'] = $_POST['family_name'];
-    $_SESSION['last_name'] = $_POST['last_name'];
-    $_SESSION['family_name_kana'] = $_POST['family_name_kana'];
-    $_SESSION['last_name_kana'] = $_POST['last_name_kana'];
-    $_SESSION['mail'] = $_POST['mail'];
-    $_SESSION['password'] = $_POST['password'];
-    $_SESSION['gender'] = $_POST['gender'];
-    $_SESSION['postal_code'] = $_POST['postal_code'];
-    $_SESSION['prefecture'] = $_POST['prefecture'];
-    $_SESSION['address_1'] = $_POST['address_1'];
-    $_SESSION['address_2'] = $_POST['address_2'];
-    $_SESSION['authority'] = $_POST['authority'];
+    // データをセッションに保存するのではなく、直接POSTデータを変数に保存
+    $family_name = $_POST['family_name'];
+    $last_name = $_POST['last_name'];
+    $family_name_kana = $_POST['family_name_kana'];
+    $last_name_kana = $_POST['last_name_kana'];
+    $mail = $_POST['mail'];
+    $password = $_POST['password'];
+    $gender = $_POST['gender'];
+    $postal_code = $_POST['postal_code'];
+    $prefecture = $_POST['prefecture'];
+    $address_1 = $_POST['address_1'];
+    $address_2 = $_POST['address_2'];
+    $authority = $_POST['authority'];
 
-    header("Location: regist_confirm.php");
+    // パスワードをマスクする
+    $masked_password = str_repeat('●', strlen($password));
+} else {
+    // POSTリクエストではない場合、前のページに戻る
+    header("Location: regist.php");
     exit();
 }
-
-// リロード時にセッションデータをリセット
-if ($_SERVER["REQUEST_METHOD"] === "GET" && !isset($_SERVER['HTTP_REFERER'])) {
-    session_unset();
-}
-
-// セッション変数のチェックと取得
-$family_name = isset($_SESSION['family_name']) ? $_SESSION['family_name'] : '';
-$last_name = isset($_SESSION['last_name']) ? $_SESSION['last_name'] : '';
-$family_name_kana = isset($_SESSION['family_name_kana']) ? $_SESSION['family_name_kana'] : '';
-$last_name_kana = isset($_SESSION['last_name_kana']) ? $_SESSION['last_name_kana'] : '';
-$mail = isset($_SESSION['mail']) ? $_SESSION['mail'] : '';
-$password = isset($_SESSION['password']) ? $_SESSION['password'] : '';
-$gender = isset($_SESSION['gender']) ? $_SESSION['gender'] : '';
-$postal_code = isset($_SESSION['postal_code']) ? $_SESSION['postal_code'] : '';
-$prefecture = isset($_SESSION['prefecture']) ? $_SESSION['prefecture'] : '';
-$address_1 = isset($_SESSION['address_1']) ? $_SESSION['address_1'] : '';
-$address_2 = isset($_SESSION['address_2']) ? $_SESSION['address_2'] : '';
-$authority = isset($_SESSION['authority']) ? $_SESSION['authority'] : '';
-
-// パスワードを●でマスクする
-$masked_password = str_repeat('●', strlen($password));
 ?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -60,11 +44,11 @@ $masked_password = str_repeat('●', strlen($password));
             font-family: Arial, sans-serif;
         }
         .header, .footer {
-            padding:5px;
+            padding: 5px;
             background-color: #f8f8f8;
             border-bottom: 1px solid #ddd;
         }
-        p{
+        p {
             text-align: center;
         }
         .container {
@@ -157,12 +141,23 @@ $masked_password = str_repeat('●', strlen($password));
 
         <div class="buttons">
             <form action="regist_complete.php" method="post">
+                <!-- 隠しフィールドとしてPOSTデータを送信 -->
+                <input type="hidden" name="family_name" value="<?php echo htmlspecialchars($family_name, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="last_name" value="<?php echo htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="family_name_kana" value="<?php echo htmlspecialchars($family_name_kana, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="last_name_kana" value="<?php echo htmlspecialchars($last_name_kana, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="mail" value="<?php echo htmlspecialchars($mail, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="password" value="<?php echo htmlspecialchars($password, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="gender" value="<?php echo htmlspecialchars($gender, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="postal_code" value="<?php echo htmlspecialchars($postal_code, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="prefecture" value="<?php echo htmlspecialchars($prefecture, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="address_1" value="<?php echo htmlspecialchars($address_1, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="address_2" value="<?php echo htmlspecialchars($address_2, ENT_QUOTES, 'UTF-8'); ?>">
+                <input type="hidden" name="authority" value="<?php echo htmlspecialchars($authority, ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="submit">登録する</button>
             </form>
-            <a href="javascript:history.back()">
-                <button type="button">前に戻る</button>
-            </a>
-        </div>     
+            <button type="button" onclick="history.back()">前に戻る</button>
+        </div>
     </div>
     <div class="footer">
         <p>フッター</p>

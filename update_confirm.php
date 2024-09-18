@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Invalid CSRF token");
     }
 
-    // POSTデータを変数に保存
+    // POSTデータを取得
     $id = $_POST['id'];
     $family_name = $_POST['family_name'];
     $last_name = $_POST['last_name'];

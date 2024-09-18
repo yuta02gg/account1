@@ -7,6 +7,7 @@ if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
     echo 'アクセスが拒否されました。';
     exit;
 }
+
 // CSRFトークンを生成してセッションに保存
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

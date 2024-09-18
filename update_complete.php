@@ -7,6 +7,9 @@ if (!isset($_SESSION['authority']) || $_SESSION['authority'] != 1) {
     echo 'アクセスが拒否されました。';
     exit;
 }
+// 変数の初期化
+$error_message = '';
+$success_message = '';
 
 // CSRFトークンの検証
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -65,13 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $stmt->execute();
 
-        // 更新後、セッションに新しい権限を反映
-        $_SESSION['authority'] = $authority;
-
-        header('Location: success.php'); // 成功ページにリダイレクト
-        exit;
+        $success_message = 'アカウントの更新が完了しました。';
     } catch (Exception $e) {
-        echo 'エラーが発生しました: ' . $e->getMessage();
+        $error_message = 'エラーが発生しました: ' . $e->getMessage();
     }
 } else {
     die("Invalid request");
